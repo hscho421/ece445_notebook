@@ -1,5 +1,7 @@
 # Auto Guitar Tuner  
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=O1a539eG_tw&feature=youtu.be" frameborder="0" allowfullscreen></iframe>
+[Watch Demo Video](https://www.youtube.com/watch?v=O1a539eG_tw&feature=youtu.be)
+
+<video controls src="IMG_9519.mov" title="Title"></video>
 
 An automated, microcontroller-driven guitar tuner that detects pitch in real time using digital signal processing and precisely adjusts tuning pegs using a servo-based mechanical interface. Built on the ESP32 platform, the tuner integrates audio sensing (piezo), autocorrelation pitch detection, a TFT-based user interface, and closed-loop servo control to achieve reliable, hands-free tuning.
 
@@ -44,5 +46,6 @@ The system supports:
 - Safety warnings and success animations  
 ---
 ## 📹 Demo
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=O1a539eG_tw&feature=youtu.be" frameborder="0" allowfullscreen></iframe>
+[Watch Demo Video](https://www.youtube.com/watch?v=O1a539eG_tw&feature=youtu.be)
 
+<video controls src="IMG_9519.mov" title="Title"></video>
