@@ -62,9 +62,8 @@ Researched pitch detection approaches:
 1. **FFT (Fast Fourier Transform):** Converts time-domain signal to frequency spectrum
 2. **Autocorrelation:** Finds periodicity by comparing signal with delayed copies
 
-Initial reading suggests autocorrelation may be better for guitar due to strong harmonics.
 
-Guitar standard tuning frequencies I need to detect:
+Guitar standard tuning frequencies:
 - E2: 82.41 Hz
 - A2: 110.00 Hz  
 - D3: 146.83 Hz
@@ -95,7 +94,7 @@ For accurate pitch detection, need to satisfy Nyquist criterion:
 
 $$f_s > 2 \cdot f_{max}$$
 
-With f_max = 450 Hz, minimum sampling rate is 900 Hz. Selected f_s = 8192 Hz for margin and efficient computation (power of 2).
+With f_max = 450 Hz, minimum sampling rate is 900 Hz. Go with 8192Hz.
 
 ---
 
@@ -105,18 +104,12 @@ With f_max = 450 Hz, minimum sampling rate is 900 Hz. Selected f_s = 8192 Hz for
 
 ### Objectives
 
-- Understand ADC capabilities of ESP32
 - Plan initial prototype
 
 ### Work Done
 
 ESP32 ADC specifications reviewed:
-- 12-bit resolution (0–4095)
 - Multiple attenuation settings available
-
-Next steps identified:
-- Order microphone module for initial testing
-- Write basic ADC sampling code
 
 ---
 
@@ -276,11 +269,8 @@ Conducted detailed analysis of MAX9814 microphone performance. Significant issue
 
 **Problem 1: Environmental Noise**
 - Microphone picks up ambient room noise
-- HVAC, voices, and other sounds interfere with detection
-- AGC amplifies noise during quiet periods
 
 **Problem 2: Distance Sensitivity**
-- Signal amplitude varies significantly with distance from guitar
 - Inconsistent readings depending on playing position
 
 ---
@@ -299,14 +289,13 @@ Conducted detailed analysis of MAX9814 microphone performance. Significant issue
 **Problem 3: Harmonic Confusion**
 - Guitar strings produce strong harmonics
 - FFT often identifies harmonic as dominant frequency
-- Particularly problematic for low E string (E2)
 
-Attempted software solutions:
-1. **Software filtering:** Implemented basic low-pass filter — helped slightly but not sufficient
-2. **Noise gate:** Added threshold to ignore low-amplitude signals — reduced false triggers but didn't solve harmonic issue
-3. **Windowing:** Tried different FFT window functions — minimal improvement
+Attempted software solution:
 
-**Decision:** After discussion with team, will investigate piezoelectric sensor as alternative. Piezo sensors detect vibration through direct contact and are immune to ambient noise.
+**Software filtering:** Implemented basic low-pass filter... helped slightly but not sufficient
+
+
+**Decision:** Discuss piezo
 
 ---
 
@@ -490,8 +479,7 @@ float detectPitchAutocorrelation(float expectedFreq) {
 }
 ```
 
-FFT: ~5ms computation, struggles with harmonics
-Autocorrelation: ~15ms computation, correctly identifies fundamental
+Result: Autocorrelation correctly identified pitch
 
 ---
 
@@ -510,13 +498,10 @@ Autocorrelation: ~15ms computation, correctly identifies fundamental
 
 Reasons for choosing autocorrelation over FFT:
 
-1. **Harmonic handling:** Autocorrelation naturally finds the fundamental period, even when harmonics are stronger in amplitude. The period of harmonics aligns with the fundamental period, so the autocorrelation function peaks at the correct lag.
-
-2. **Low string accuracy:** E2 detection improved from 165 Hz (wrong. Detecting first harmonic) to 82 Hz (correct fundamental).
-
-3. **Consistent results:** Less variation between repeated measurements.
-
-4. **Tuning-friendly:** Can constrain lag search range around expected frequency for faster detection.
+1. Harmonic handling
+2. Low string accuracy
+3. Consistent results
+4. Tuning-friendly
 
 Added parabolic interpolation for sub-sample accuracy:
 
@@ -647,11 +632,8 @@ Began testing PCB
 
 Loaded firmware onto PCB-mounted ESP32. Initial issues encountered:
 
-**Issue 1: Display not initializing**
-- Symptom: White screen on power-up
-- Cause: SPI pin assignments differed from breadboard prototype
-- Solution: Updated pin definitions to match PCB routing
-- Verification: Display now shows standby screen correctly
+**Issue: Display not initializing**
+- White screen on power-up
 
 ---
 
@@ -667,15 +649,10 @@ Loaded firmware onto PCB-mounted ESP32. Initial issues encountered:
 ### Work Done
 
 **Issue 2: ADC readings erratic**
-- Symptom: Noisy frequency readings even with no input
-- Cause: Noise coupling from servo motor power lines
-- Solution: Added software averaging and timing separation
-- Verification: Clean readings with noise threshold working
+- Noisy frequency readings even with no input
 
 **Issue 3: Button double-triggering**
-- Symptom: Single press registered as multiple presses
-- Cause: Mechanical contact bounce
-- Solution: Implemented software debounce with 50ms minimum:
+- Single press registered as multiple presses
 
 ```cpp
 int readButtonPress(int buttonIndex, int pin) {
